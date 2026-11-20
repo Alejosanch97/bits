@@ -1,14 +1,11 @@
-import {
-    defineConfig
-} from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
+// base './' permite publicar en Netlify, Vercel, GitHub Pages o abrir desde cualquier carpeta
 export default defineConfig({
-    plugins: [react()],
-    server: {
-        port: 3000
-    },
-    build: {
-        outDir: 'dist'
-    }
-})
+  base: './',
+  plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 1200,
+  },
+});
