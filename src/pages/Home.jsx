@@ -7,17 +7,20 @@ import { sfx } from '../lib/sfx.js';
 import { speak } from '../lib/speech.js';
 import { TODAS_LAS_PALABRAS } from '../data/espanol.js';
 import { ENGLISH } from '../data/english.js';
+import { JUEGOS } from '../games/index.js';
 
 const TOTAL_ES = TODAS_LAS_PALABRAS.length;
 const TOTAL_EN = ENGLISH.reduce((s, c) => s + c.items.length, 0);
 
 const PRINCIPALES = [
   { to: '/letras', titulo: 'Letras', sub: 'Lengua Castellana', info: `${TOTAL_ES.toLocaleString('es-CO')} palabras`, icono: 'a', cls: 'm-letras', voz: 'Mundo de letras' },
-  { to: '/numeros', titulo: 'Números', sub: 'Matemáticas', info: 'Puntos, 0 al 1000, sumas', icono: '123', cls: 'm-numeros', voz: 'Mundo de números' },
+  { to: '/numeros', titulo: 'Números', sub: 'Matemáticas', info: 'Puntos, Singapur, 0 al 10.000, tablas', icono: '123', cls: 'm-numeros', voz: 'Mundo de números' },
   { to: '/english', titulo: 'English', sub: 'Inglés', info: `${TOTAL_EN} words`, icono: 'Hi!', cls: 'm-english', voz: 'English Island' },
+  { to: '/juegos', titulo: 'Juegos', sub: 'Isla del Conocimiento', info: `${JUEGOS.length} juegos · niveles y premios`, icono: '🎮', cls: 'm-juegos', voz: 'Juegos' },
 ];
 
 const SECUNDARIOS = [
+  { to: '/lector', titulo: 'Lector Cohete', sub: 'Lectura rápida', icono: '🚀', cls: 's-lector' },
   { to: '/mis-bits', titulo: 'Mis bits', sub: 'Los que crea la profe', icono: '✨', cls: 's-misbits' },
   { to: '/premios', titulo: 'Premios', sub: 'Cofre y stickers', icono: '🎁', cls: 's-premios' },
   { to: '/profe', titulo: 'Profe', sub: 'Ajustes de la clase', icono: '🍎', cls: 's-profe' },

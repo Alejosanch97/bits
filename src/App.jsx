@@ -11,6 +11,8 @@ import { EnglishHome, EnglishCategory } from './pages/English.jsx';
 import Premios from './pages/Premios.jsx';
 import Profe from './pages/Profe.jsx';
 import MisBits from './pages/MisBits.jsx';
+import Lector from './pages/Lector.jsx';
+import { JuegosHub, JuegoPage } from './pages/Juegos.jsx';
 
 function Routed() {
   const loc = useLocation();
@@ -29,6 +31,9 @@ function Routed() {
           <Route path="/premios" element={<Premios />} />
           <Route path="/profe" element={<Profe />} />
           <Route path="/mis-bits" element={<MisBits />} />
+          <Route path="/lector" element={<Lector />} />
+          <Route path="/juegos" element={<JuegosHub />} />
+          <Route path="/juegos/:id" element={<JuegoPage />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

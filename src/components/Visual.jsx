@@ -27,25 +27,28 @@ function useFitText(ref, deps) {
   }, deps); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-// Palabra con la letra protagonista resaltada (método Glenn Doman: letra grande y clara)
+// Palabra estilo bit: PRIMERA letra en MAYÚSCULA y roja, el resto en negro
+// (el resto en minúscula o en mayúscula según el botón abc / ABC).
+// Si la letra que se estudia está dentro de la palabra (p. ej. la ñ de piña), se subraya.
 export function Word({ text, letra, upper = false, className = '' }) {
   const ref = useRef(null);
   useFitText(ref, [text, upper, className]);
-  const shown = upper ? text.toUpperCase() : text;
-  // Las mayúsculas son más anchas: se cuentan como más letras para el tamaño inicial
-  const style = { '--len': Math.max(4, Math.ceil(text.length * (upper ? 1.35 : 1))) };
+  const first = text.charAt(0).toUpperCase();
+  const rest = upper ? text.slice(1).toUpperCase() : text.slice(1);
+  const style = { '--len': Math.max(4, Math.ceil(text.length * (upper ? 1.35 : 1.08))) };
   let idx = -1;
   if (letra) {
     for (let i = 0; i < text.length; i++) {
       if (baseLetter(text[i]) === letra) { idx = i; break; }
     }
   }
-  if (idx < 0) return <span ref={ref} className={`word ${className}`} style={style}>{shown}</span>;
+  const restNodes = idx > 0
+    ? <>{rest.slice(0, idx - 1)}<span className="word-mark">{rest[idx - 1]}</span>{rest.slice(idx)}</>
+    : rest;
   return (
     <span ref={ref} className={`word ${className}`} style={style}>
-      {shown.slice(0, idx)}
-      <span className="word-hl">{shown[idx]}</span>
-      {shown.slice(idx + 1)}
+      <span className="word-first">{first}</span>
+      <span className="word-rest">{restNodes}</span>
     </span>
   );
 }

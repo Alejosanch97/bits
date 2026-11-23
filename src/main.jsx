@@ -9,6 +9,7 @@ import './styles/home.css';
 import './styles/worlds.css';
 import './styles/player.css';
 import './styles/extras.css';
+import './styles/games.css';
 import App from './App.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

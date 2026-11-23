@@ -1,9 +1,10 @@
 /* ---------- Palabras ---------- */
 .word { display: inline-block; font-family: var(--read); font-weight: 700; color: var(--red); letter-spacing: .5px; white-space: nowrap; }
-.word-hl { color: var(--ink); display: inline-block; font-size: 1.12em; position: relative; }
-.word-hl::after {
-  content: ''; position: absolute; left: 6%; right: 6%; bottom: .02em; height: .09em; border-radius: 9px;
-  background: var(--sun);
+.word .word-first { color: var(--red); }
+.word .word-rest { color: #1B1B24; }
+.word-mark { position: relative; display: inline-block; }
+.word-mark::after {
+  content: ''; position: absolute; left: 6%; right: 6%; bottom: .02em; height: .09em; border-radius: 9px; background: var(--sun);
 }
 
 /* ---------- Mazo (DeckView) ---------- */
@@ -197,3 +198,121 @@
   .card-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .balloons.vowels { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* =========================================================================
+   Números v3 — Singapur, marcos de 10, restas y multiplicación
+   ========================================================================= */
+.d-m { color: var(--grape); } .d-dm { color: var(--leaf); }
+.t-m { color: var(--grape); }
+
+/* Cubo de mil (3D simple) */
+.b10-cubes { gap: 14px 18px; max-width: 620px; }
+.b10-cube {
+  position: relative; display: inline-block; width: 64px; height: 64px; margin: 10px 10px 0 0;
+  background-color: var(--grape); border: 2.5px solid var(--ink); border-radius: 6px;
+  background-image: linear-gradient(rgba(255,255,255,.4) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(255,255,255,.4) 1.5px, transparent 1.5px);
+  background-size: 6.4px 6.4px; animation: dotIn .45s cubic-bezier(.2, 1.8, .4, 1) both;
+}
+.b10-cube::before, .b10-cube::after { content: ''; position: absolute; border: 2.5px solid var(--ink); }
+.b10-cube::before { /* cara superior */
+  left: -2.5px; right: -2.5px; height: 12px; top: -14px; background: #A68AF0;
+  transform: skewX(-40deg); transform-origin: bottom; border-radius: 4px 4px 0 0;
+}
+.b10-cube::after { /* cara lateral */
+  top: -2.5px; bottom: -2.5px; width: 12px; right: -14px; background: #5B36B8;
+  transform: skewY(-50deg); transform-origin: left; border-radius: 0 4px 4px 0;
+}
+.b10-cube.sm { width: 42px; height: 42px; background-size: 4.2px 4.2px; margin: 8px 8px 0 0; }
+.b10-cube.sm::before { height: 8px; top: -10px; } .b10-cube.sm::after { width: 8px; right: -10px; }
+
+.base10.compact { gap: 16px; margin-top: 10px; min-height: 0; }
+.base10.compact .b10-hundred { width: 62px; height: 62px; background-size: 6.2px 6.2px; }
+.base10.compact .b10-ten { width: 10px; height: 62px; background-size: 6.2px 6.2px; }
+.base10.compact .b10-unit { width: 15px; height: 15px; border-radius: 4px; }
+.base10.compact .b10-cube { width: 46px; height: 46px; background-size: 4.6px 4.6px; }
+.base10.compact .b10-cube::before { height: 9px; top: -11px; } .base10.compact .b10-cube::after { width: 9px; right: -11px; }
+.base10.compact .b10-row { max-width: 360px; gap: 5px; }
+
+.place-table { display: inline-flex; gap: 6px; margin: 0 auto 6px; border: 3px solid var(--ink); border-radius: 16px; overflow: hidden; background: #fff; }
+.pt-col { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
+.pt-col b { width: 100%; text-align: center; background: var(--ink); color: #fff; font-family: var(--display); font-weight: 400; font-size: 18px; padding: 2px 0; }
+.pt-col .digit { font-family: var(--display); font-size: 46px; padding: 2px 8px 6px; }
+
+.set-blocks { background: #fff; border: 3px solid var(--ink); border-radius: 18px; padding: 8px 12px 12px; min-height: 108px; display: grid; place-items: center; transform: rotate(-2deg); width: 100%; }
+.set-blocks .base10 { margin: 0; }
+.bit-blocks { display: grid; place-items: center; max-width: 100%; }
+.bit-blocks.big .base10 { transform: scale(1.25); transform-origin: center; }
+.quiz-blocks { padding: 6px 12px; }
+.num-back .bit-blocks { max-height: 32vh; overflow: hidden; }
+
+/* Marcos de 10 */
+.tenframes { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.tenframe { display: grid; grid-template-columns: repeat(5, var(--cell)); grid-auto-rows: var(--cell); gap: 4px; padding: 6px; background: #fff; border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); }
+.tf-md { --cell: clamp(40px, 4.6vw, 62px); }
+.tf-sm { --cell: clamp(32px, 3.4vw, 46px); }
+.tf-cell { border-radius: 10px; background: #F6F1E7; border: 2px dashed rgba(29, 42, 107, .2); display: grid; place-items: center; position: relative; }
+.tf-cell.on { background: #FFF8E2; border-style: solid; border-color: rgba(29, 42, 107, .25); }
+.tf-obj { font-family: var(--emoji); font-size: calc(var(--cell) * .66); line-height: 1; display: inline-block; animation: dotIn .45s cubic-bezier(.2, 1.8, .4, 1) both; }
+.tf-cell.gone .tf-obj { opacity: .3; filter: grayscale(.7); transition: opacity .6s, filter .6s; }
+.tf-cell.gone::after, .blk-wrap.gone::after {
+  content: ''; position: absolute; inset: 8%; pointer-events: none;
+  background:
+    linear-gradient(45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%);
+  animation: crossIn .35s cubic-bezier(.2, 1.8, .4, 1) both;
+}
+@keyframes crossIn { from { transform: scale(0) rotate(-90deg); } }
+.block-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-end; max-width: 320px; }
+.blk-wrap { position: relative; display: inline-block; }
+.blk-wrap.gone > span { opacity: .3; transition: opacity .6s; }
+
+/* Tablero de operaciones en cuadrícula: dibujos arriba, números abajo (siempre alineados) */
+.op-grid {
+  display: grid; grid-template-columns: auto auto auto auto auto; grid-template-rows: auto auto;
+  align-items: end; justify-content: center; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 14px; margin: 26px 0 10px; cursor: pointer;
+}
+.op-grid > * { justify-self: center; }
+.og-vis { align-self: end; min-height: 80px; display: flex; align-items: flex-end; justify-content: center; }
+.op-grid .op-num { font-size: clamp(64px, 8vw, 110px); }
+.op-grid .op-sign { align-self: center; }
+.bye-box { display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: .25; transform: scale(.9); transition: all .5s cubic-bezier(.2, 1.6, .4, 1); }
+.bye-box.show { opacity: 1; transform: none; }
+.bye-label { font-weight: 900; background: #FFD9D3; border: 2.5px solid var(--ink); border-radius: 999px; padding: 3px 12px; font-size: 15px; white-space: nowrap; }
+.op-sign.mul, .eq-back b.mul { color: var(--tang); }
+
+/* Multiplicación */
+.mul-groups { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 900px; margin: 0 auto; }
+.mul-plate {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 10px; min-width: 96px; place-items: center;
+  border-radius: 50%; background: radial-gradient(circle, #fff 55%, #EDE6FF 56%); border: 3px solid var(--ink); aspect-ratio: 1;
+  box-shadow: 0 5px 0 var(--ink); animation: cardIn .5s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+.mul-obj { font-family: var(--emoji); font-size: 24px; line-height: 1; }
+.mul-groups.compact .mul-plate { min-width: 0; width: clamp(80px, 9vw, 130px); }
+.mul-groups.compact .mul-obj { font-size: clamp(16px, 2vw, 30px); }
+.mulx { background: #fff; border: 4px solid var(--ink); border-radius: 36px; padding: clamp(18px, 3vw, 36px); box-shadow: var(--shadow); text-align: center; }
+.mulx-tables { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; font-family: var(--display); font-size: 26px; }
+.mulx-chip { width: 58px; height: 58px; border-radius: 18px; border: 3px solid var(--ink); background: #fff; font-family: var(--display); font-size: 28px; box-shadow: var(--shadow-sm); transition: transform .15s; }
+.mulx-chip.on { background: var(--tang); color: #fff; transform: translateY(-3px) rotate(-4deg); }
+.mulx-body { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 22px; }
+.mulx-step { display: flex; align-items: center; gap: 16px; font-family: var(--display); font-size: clamp(24px, 3vw, 36px); }
+.mulx-step .pad-btn { min-width: 64px; height: 60px; }
+.mulx-sum { font-family: var(--display); font-size: clamp(24px, 3vw, 38px); margin: 0; color: var(--ink-soft); }
+.mulx-sum b { color: var(--tang); }
+.mulx-eq { display: flex; align-items: center; gap: 14px; font-size: clamp(56px, 7vw, 96px); }
+.mulx-eq .numeral { font-size: inherit; }
+.mulx-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: min(900px, 100%); }
+.mulx-row { border: 2.5px solid var(--ink); background: var(--paper); border-radius: 14px; padding: 8px; font-weight: 900; font-size: 17px; }
+.mulx-row.on { background: var(--sun); transform: scale(1.06); }
+.tab-games { background: linear-gradient(180deg, #FFE27A, var(--sun)); }
+@media (max-width: 760px) { .mulx-list { grid-template-columns: repeat(2, 1fr); } .op-grid { column-gap: 8px; } }
+
+/* --- Marcos de 10 siempre dentro del cuadro de sumas/restas --- */
+.opgame { container-type: inline-size; overflow: hidden; }
+.op-grid { max-width: 100%; column-gap: clamp(6px, 2cqi, 30px); }
+.op-grid .tf-md { --cell: clamp(22px, calc((100cqi - 300px) / 15), 62px); }
+.op-grid .tf-sm { --cell: clamp(20px, calc((100cqi - 300px) / 15), 46px); }
+.op-grid .tenframe { gap: 3px; padding: 5px; }
+.op-grid .op-num, .op-grid .op-sign { font-size: clamp(44px, 8cqi, 110px); }
+.op-grid .op-answer { min-width: clamp(90px, 13cqi, 150px); height: clamp(90px, 13cqi, 150px); font-size: clamp(56px, 8cqi, 100px); }
+.op-grid .op-answer .numeral { font-size: clamp(56px, 8cqi, 100px); }

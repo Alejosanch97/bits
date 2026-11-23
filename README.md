@@ -4,7 +4,7 @@ Plataforma de bits (método Glenn Doman) para preescolar: **Lengua Castellana**,
 
 ## Escudo oficial
 
-Guarda la imagen del escudo como **`public/escudo.png`** (también sirve `escudo.jpg` o `escudo.webp`). La app la usa automáticamente en el inicio y en la barra superior. Si no está, se muestra el escudo dibujado.
+El escudo oficial ya viene en **`public/escudo.png`** (con fondo transparente). Para cambiarlo, reemplaza ese archivo con otro del mismo nombre.
 
 ## Arrancar
 
@@ -16,16 +16,28 @@ npm run build      # genera /dist para publicar (Netlify, Vercel, GitHub Pages�
 
 ## Qué trae
 
-| Mundo | Contenido |
+| Sección | Contenido |
 |---|---|
-| 🅰️ Mundo de Letras | 27 letras (vocales primero), ~300 bits por letra en grupos de 20, letra protagonista resaltada, sílabas (ma me mi mo mu), "Lee y encuentra", "Mira y lee", mezcla mágica |
-| 🔢 Mundo de Números | Tarjetas de puntos rojos (1–100), bits de numerales con colores por posición, explorador 0–1000 con bloques base 10, sumas y restas (hasta 5, 10, 20, decenas, centenas), "¿Cuántos hay?" |
-| 🌴 English Island | 17 mundos: farm, school, colors, numbers, animals, ocean, fruits, food, body, family, transport, clothes, weather, toys, feelings, actions, shapes |
-| 🎁 Cofre de premios | Las monedas ganadas abren un cofre con 36 stickers (comunes, raros y legendarios) |
-| ✨ Mis bits | Mazos propios con emoji o foto. Se guardan en el navegador; Exportar/Importar para cambiar de computador; "Pasar al archivo" para dejarlos fijos en `src/data/mis-bits.js` |
-| 🍎 Rincón de la profe | Dar monedas a la clase, velocidad de bits y voz, MAYÚSCULAS/minúsculas |
+| 🅰️ Letras | 27 letras, ~300 bits por letra en grupos de 20. Bits estilo Doman: **primera letra en MAYÚSCULA roja**, el resto en negro (minúscula o MAYÚSCULA). Sílabas, "Lee y encuentra", "Mira y lee" |
+| 🔢 Números | Puntos de Doman del 1 al 20 · método Singapur (cubitos, barras, placas y cubos de mil) hasta el 10.000 · explorador 0–10.000 con tabla UM-C-D-U · sumas y restas con marcos de 10 · tablas del 1 al 9 · "¿Cuántos hay?" |
+| 🌴 English | 17 mundos de vocabulario |
+| 🎮 Juegos | **22 juegos** en 5 islas (números, operaciones, tablas, palabras, letras) con niveles, combos, monedas y estrellas |
+| 🚀 Lector Cohete | Teleprompter: la profe escribe el texto, ajusta tamaño y velocidad; cronómetro, palabras por minuto y cada palabra se colorea. Modo automático o clic a clic |
+| ✨ Mis bits | Mazos propios con emoji o foto; Exportar/Importar; "Pasar al archivo" para dejarlos fijos en `src/data/mis-bits.js` |
+| 🎁 Premios | Cofre y álbum de 36 stickers |
+| 🍎 Profe | Monedas para la clase, velocidad, voz, MAYÚSCULAS |
 
-**En el video beam:** botón ⛶ = pantalla completa · Espacio = pausa · ← → = anterior/siguiente · Esc = salir.
+### Juegos
+
+- **Números:** El tesoro de los números · El tren numérico · Alimenta al monstruo · Misión espacial · Construye el número · El cocodrilo comelón
+- **Operaciones:** El mono comelón · Los patitos perdidos · La pastelería matemática · Repara al robot · Cruza el río
+- **Tablas:** Las ranas saltarinas · Fábrica de grupos · La heladería multiplicadora · El piano de las tablas
+- **Palabras:** Palabras relámpago · Parejas mágicas · El detective de palabras · Construye la palabra
+- **Letras:** El camino de las letras (trazar con el dedo) · El zoológico de los sonidos · Explota la letra
+
+Para agregar un juego: crea el componente en `src/games/` y regístralo en `src/games/index.js`.
+
+**En el video beam:** botón ⛶ = pantalla completa · Espacio = pausa / siguiente · ← → = anterior/siguiente · Esc = salir.
 
 ## Agregar palabras
 

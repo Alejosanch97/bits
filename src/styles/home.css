@@ -118,7 +118,7 @@
 @keyframes letterBob { 50% { transform: translateY(-8px) rotate(-3deg); } }
 .home-sub { margin: 0; font-weight: 900; font-size: clamp(14px, 1.6vw, 20px); background: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 4px 16px; box-shadow: var(--shadow-sm); }
 
-.menu-main { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2.4vw, 32px); min-height: 0; max-width: 1300px; width: 100%; margin: 0 auto; }
+.menu-main { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(14px, 2.4vw, 32px); min-height: 0; max-width: 1300px; width: 100%; margin: 0 auto; }
 .menu-tile {
   position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(6px, 1.4vh, 16px);
   border-radius: 40px; border: 5px solid var(--ink); box-shadow: 0 12px 0 var(--ink); padding: clamp(10px, 2vh, 24px) 16px;
@@ -133,6 +133,9 @@
 .m-letras { background: linear-gradient(170deg, #FF7A59, var(--red)); }
 .m-numeros { background: linear-gradient(170deg, #FFDB6E, var(--sun-deep)); }
 .m-english { background: linear-gradient(170deg, #8BDCF7, var(--blue)); }
+.m-juegos { background: linear-gradient(170deg, #B9F0A0, var(--leaf)); }
+.m-juegos .tile-badge { font-family: var(--emoji); font-size: clamp(44px, 8vh, 88px); }
+.s-lector .sec-icon { background: #FFE4CC; }
 .tile-badge {
   width: clamp(84px, 17vh, 170px); aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
   background: #fff; border: 5px solid var(--ink); box-shadow: inset 0 -10px 0 rgba(29, 42, 107, .12);
@@ -143,13 +146,13 @@
 .m-english .tile-badge { font-family: var(--display); font-weight: 400; font-size: clamp(36px, 7vh, 76px); color: var(--blue); }
 .menu-tile:hover .tile-badge { animation: wiggle .8s ease-in-out; }
 .tile-text { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #fff; }
-.tile-text b { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 5.4vh, 54px); line-height: 1; -webkit-text-stroke: 2.5px var(--ink); paint-order: stroke fill; text-shadow: 0 4px 0 var(--ink); }
+.tile-text b { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 5vh, 50px); line-height: 1; -webkit-text-stroke: 2.5px var(--ink); paint-order: stroke fill; text-shadow: 0 4px 0 var(--ink); }
 .tile-text small { font-weight: 900; font-size: clamp(14px, 2vh, 19px); color: var(--ink); background: rgba(255,255,255,.85); border-radius: 999px; padding: 2px 12px; margin-top: 4px; }
 .tile-text em { font-style: normal; font-weight: 800; font-size: clamp(12px, 1.7vh, 15px); color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
 .tile-go { background: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 6px 20px; font-family: var(--display); font-size: clamp(16px, 2.4vh, 22px); box-shadow: var(--shadow-sm); color: var(--ink); }
 .menu-tile:hover .tile-go { background: var(--sun); }
 
-.menu-sec { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 24px); max-width: 1300px; width: 100%; margin: 0 auto; }
+.menu-sec { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 2vw, 24px); max-width: 1300px; width: 100%; margin: 0 auto; }
 .sec-tile {
   display: flex; align-items: center; gap: 14px; padding: clamp(8px, 1.4vh, 14px) 18px;
   border-radius: 26px; border: 4px solid var(--ink); background: #fff; box-shadow: var(--shadow-sm);
@@ -169,6 +172,7 @@
 .home-hud-brand-hide .hud-brand { display: none; }
 
 @media (max-width: 1100px) { .home-chispa { display: none; } }
+@media (max-width: 1000px) and (min-width: 761px) { .menu-main, .menu-sec { grid-template-columns: repeat(2, 1fr); } .home { height: auto; min-height: 100dvh; overflow: visible; } }
 @media (max-width: 760px) {
   .home { height: auto; min-height: 100dvh; overflow: visible; }
   .home-head { flex-direction: column; text-align: center; }
