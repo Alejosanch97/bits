@@ -8,7 +8,7 @@ const VOCALES = ['a', 'e', 'i', 'o', 'u'];
 const ORDEN = ['a', 'e', 'i', 'o', 'u', 'm', 'p', 's', 'l', 't', 'n', 'd', 'c', 'r', 'f', 'b', 'v', 'g', 'j', 'h', 'ñ', 'q', 'k', 'y', 'z', 'x', 'w'];
 const COLORES = ['#E8412C', '#1D2A6B', '#F2A20C', '#2E9E5B', '#2F8FD8', '#E0598B', '#7A4FD6', '#F26B1D'];
 
-function parse(str) {
+export function parse(str) {
   return str.split(/\s+/).filter(Boolean).map((tok) => {
     const i = tok.indexOf(':');
     const texto = (i >= 0 ? tok.slice(0, i) : tok).replace(/_/g, ' ').trim();
@@ -18,7 +18,7 @@ function parse(str) {
 }
 
 // 1. Diccionario global de imágenes
-const EMOJI = { ...EMOJI_EXTRA };
+export const EMOJI = { ...EMOJI_EXTRA };
 const parsed = {};
 for (const l of ORDEN) {
   parsed[l] = parse(`${VOCABULARIO[l] || ''} ${VOCABULARIO_EXTRA[l] || ''}`);

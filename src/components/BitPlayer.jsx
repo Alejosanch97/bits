@@ -22,7 +22,7 @@ const SPEEDS = [
  * items: [{ texto, emoji?, img?, swatch?, numero?, letra? }]
  * renderFront(item) / renderBack(item): personalizar (p. ej. tarjetas de puntos)
  */
-export default function BitPlayer({ items, lang = 'es', title, onClose, renderFront, renderBack, sayText, reward = 3 }) {
+export default function BitPlayer({ items, lang = 'es', title, onClose, renderFront, renderBack, sayText, sayBack, langBack = 'en', reward = 3 }) {
   const { settings, setSettings, addCoins, bumpStat } = useStore();
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState('front');
@@ -56,6 +56,8 @@ export default function BitPlayer({ items, lang = 'es', title, onClose, renderFr
     if (phase === 'front') {
       sfx.whoosh();
       speak(sayText ? sayText(item) : item.texto, lang);
+    } else if (sayBack) {
+      speak(sayBack(item), langBack);
     }
   }, [idx, phase, done]); // eslint-disable-line react-hooks/exhaustive-deps
 

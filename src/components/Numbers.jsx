@@ -5,6 +5,7 @@ import { sfx } from '../lib/sfx.js';
 import { confettiAt, shake } from '../lib/fx.js';
 import { useStore } from '../lib/store.jsx';
 import { DotCard } from './Visual.jsx';
+import { variado } from '../lib/variedad.js';
 
 // ---------------------------------------------------------------------------
 // Número con cada cifra de un color (método Singapur):
@@ -85,7 +86,7 @@ export function PlaceTable({ n }) {
 // ---------------------------------------------------------------------------
 // Explorador 0 – 10.000
 // ---------------------------------------------------------------------------
-export function NumberExplorer() {
+export function NumberExplorer({ max = 10000 }) {
   const [n, setN] = useState(7);
   const [english, setEnglish] = useState(false);
   const t = useRef(null);
@@ -96,7 +97,7 @@ export function NumberExplorer() {
     return () => clearTimeout(t.current);
   }, [n, english]);
 
-  const add = (d) => { sfx.tap(); setN((x) => Math.max(0, Math.min(10000, x + d))); };
+  const add = (d) => { sfx.tap(); setN((x) => Math.max(0, Math.min(max, x + d))); };
 
   return (
     <div className="explorer">
@@ -106,11 +107,11 @@ export function NumberExplorer() {
         <PlaceTable n={n} />
       </div>
       <div className="explorer-pad">
-        {[-1000, -100, -10, -1].map((d) => <button key={d} className="pad-btn minus" onClick={() => add(d)}>{d}</button>)}
-        <button className="pad-btn dice" onClick={() => { sfx.pop(); setN(Math.floor(Math.random() * 10001)); }}>🎲</button>
-        {[1, 10, 100, 1000].map((d) => <button key={d} className="pad-btn plus" onClick={() => add(d)}>+{d}</button>)}
+        {[-1000, -100, -10, -1].filter((d) => -d < max).map((d) => <button key={d} className="pad-btn minus" onClick={() => add(d)}>{d}</button>)}
+        <button className="pad-btn dice" onClick={() => { sfx.pop(); setN(Math.floor(Math.random() * (max + 1))); }}>🎲</button>
+        {[1, 10, 100, 1000].filter((d) => d < max).map((d) => <button key={d} className="pad-btn plus" onClick={() => add(d)}>+{d}</button>)}
       </div>
-      <input className="explorer-range" type="range" min="0" max="10000" value={n} onChange={(e) => setN(Number(e.target.value))} />
+      <input className="explorer-range" type="range" min="0" max={max} value={n} onChange={(e) => setN(Number(e.target.value))} />
       <div className="seg center">
         <button className={!english ? 'on' : ''} onClick={() => setEnglish(false)}>Español</button>
         <button className={english ? 'on' : ''} onClick={() => setEnglish(true)}>English</button>
@@ -162,6 +163,7 @@ function BlockGroup({ n, unit, crossFrom }) {
 }
 
 function Visual({ n, unit, emoji, crossFrom }) {
+  if (unit === 'mix') return <div className="op-b10"><Base10 n={n} compact showLabels={false} /></div>;
   if (unit === 1) return <TenFrames n={n} emoji={emoji} crossFrom={crossFrom} size={n > 10 ? 'sm' : 'md'} />;
   return <BlockGroup n={n} unit={unit} crossFrom={crossFrom} />;
 }
@@ -173,36 +175,61 @@ export const OP_LEVELS = [
   { id: 'l10', label: 'Hasta 10', max: 10, unit: 1 },
   { id: 'l20', label: 'Hasta 20', max: 20, unit: 1 },
   { id: 'l100', label: 'Decenas', max: 10, unit: 10 },
+  { id: 'l2c', label: 'Dos cifras', kind: 'dos' },
+  { id: 'lll', label: 'Llevando', kind: 'llevar', only: '+' },
+  { id: 'lpr', label: 'Prestando', kind: 'prestar', only: '-' },
   { id: 'l1000', label: 'Centenas', max: 10, unit: 100 },
   { id: 'l10000', label: 'Miles', max: 10, unit: 1000 },
 ];
 
-export function makeProblem(op, level) {
-  const { unit, max } = level;
+const rr = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+
+function generar(op, level) {
   let a; let b;
-  if (op === '+') {
-    a = 1 + Math.floor(Math.random() * (max - 1));
-    b = 1 + Math.floor(Math.random() * (max - a));
-  } else {
-    a = 2 + Math.floor(Math.random() * (max - 1));
-    b = 1 + Math.floor(Math.random() * (a - 1));
+  if (level.kind === 'dos') {
+    // dos cifras sin llevar / sin prestar
+    if (op === '+') {
+      const a1 = rr(1, 7); const b1 = rr(1, 8 - a1); const a0 = rr(0, 8); const b0 = rr(0, 9 - a0);
+      a = a1 * 10 + a0; b = b1 * 10 + b0;
+    } else {
+      const a1 = rr(2, 9); const b1 = rr(1, a1 - 1); const a0 = rr(1, 9); const b0 = rr(0, a0);
+      a = a1 * 10 + a0; b = b1 * 10 + b0;
+    }
+    return { a, b, unit: 'mix' };
   }
-  a *= unit; b *= unit;
+  if (level.kind === 'llevar') {
+    const a0 = rr(2, 9); const b0 = rr(10 - a0, 9); const a1 = rr(1, 7); const b1 = rr(1, 8 - a1);
+    return { a: a1 * 10 + a0, b: b1 * 10 + b0, unit: 'mix' };
+  }
+  if (level.kind === 'prestar') {
+    const a1 = rr(3, 9); const b1 = rr(1, a1 - 1); const a0 = rr(0, 7); const b0 = rr(a0 + 1, 9);
+    return { a: a1 * 10 + a0, b: b1 * 10 + b0, unit: 'mix' };
+  }
+  const { unit, max } = level;
+  if (op === '+') { a = rr(1, max - 1); b = rr(1, max - a); } else { a = rr(2, max); b = rr(1, a - 1); }
+  return { a: a * unit, b: b * unit, unit };
+}
+
+export function makeProblem(op, level) {
+  const base = variado(`op${op}${level.id}`, () => generar(op, level), (x) => (op === '+' ? x.a + x.b : x.a - x.b), 3);
+  const { a, b } = base;
+  const step = base.unit === 'mix' ? 1 : base.unit;
   const ans = op === '+' ? a + b : a - b;
   const opts = new Set([ans]);
   let guard = 0;
-  while (opts.size < 3 && guard++ < 50) {
-    const delta = (Math.floor(Math.random() * 3) + 1) * unit * (Math.random() < 0.5 ? -1 : 1);
-    const v = ans + delta;
+  while (opts.size < 3 && guard++ < 80) {
+    const delta = base.unit === 'mix' ? (Math.random() < 0.5 ? rr(1, 3) : 10 * rr(1, 2)) : rr(1, 3) * step;
+    const v = ans + delta * (Math.random() < 0.5 ? -1 : 1);
     if (v >= 0 && v <= 10000) opts.add(v);
   }
-  return { a, b, ans, opts: [...opts].sort(() => Math.random() - 0.5), emoji: OBJ[Math.floor(Math.random() * OBJ.length)], unit };
+  return { a, b, ans, opts: [...opts].sort(() => Math.random() - 0.5), emoji: OBJ[Math.floor(Math.random() * OBJ.length)], unit: base.unit };
 }
 
-export function OperationGame({ op = '+' }) {
+export function OperationGame({ op = '+', ids }) {
   const { addCoins } = useStore();
-  const [level, setLevel] = useState(OP_LEVELS[1]);
-  const [p, setP] = useState(() => makeProblem(op, OP_LEVELS[1]));
+  const niveles = OP_LEVELS.filter((l) => (!ids || ids.includes(l.id)) && (!l.only || l.only === op));
+  const [level, setLevel] = useState(niveles[Math.min(1, niveles.length - 1)]);
+  const [p, setP] = useState(() => makeProblem(op, niveles[Math.min(1, niveles.length - 1)]));
   const [solved, setSolved] = useState(false);
   const [wrong, setWrong] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -244,7 +271,7 @@ export function OperationGame({ op = '+' }) {
   return (
     <div className="opgame">
       <div className="seg center wrap">
-        {OP_LEVELS.map((l) => <button key={l.id} className={level.id === l.id ? 'on' : ''} onClick={() => setLevel(l)}>{l.label}</button>)}
+        {niveles.map((l) => <button key={l.id} className={level.id === l.id ? 'on' : ''} onClick={() => setLevel(l)}>{l.label}</button>)}
       </div>
       {streak >= 2 && <div className="streak">🔥 {streak} seguidas</div>}
       <div className={`op-grid ${op === '-' ? 'is-minus' : ''}`} key={`${p.a}${p.b}${p.emoji}`} onClick={() => sayIt(p)}>
@@ -306,8 +333,8 @@ export function GroupsVisual({ groups, each, emoji = '🍓', compact = false }) 
 
 const MUL_EMOJI = ['🍓', '🍎', '⭐', '🐞', '🍪', '🎈', '🐟', '🌸', '🍩'];
 
-export function MultiplicationExplorer({ onBits }) {
-  const [tabla, setTabla] = useState(2);
+export function MultiplicationExplorer({ onBits, tablas = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
+  const [tabla, setTabla] = useState(tablas[Math.min(1, tablas.length - 1)]);
   const [veces, setVeces] = useState(3);
   const emoji = MUL_EMOJI[tabla - 1];
   const r = tabla * veces;
@@ -321,7 +348,7 @@ export function MultiplicationExplorer({ onBits }) {
     <div className="mulx">
       <div className="mulx-tables">
         <span>Tabla del</span>
-        {Array.from({ length: 9 }, (_, i) => i + 1).map((t) => (
+        {tablas.map((t) => (
           <button key={t} className={`mulx-chip ${t === tabla ? 'on' : ''}`} onClick={() => { sfx.tap(); setTabla(t); }}>{t}</button>
         ))}
       </div>

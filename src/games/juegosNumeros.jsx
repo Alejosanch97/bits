@@ -5,6 +5,7 @@ import { sfx } from '../lib/sfx.js';
 import { Numeral, Base10 } from '../components/Numbers.jsx';
 import { DotCard } from '../components/Visual.jsx';
 import { rnd, pick, shuffle, opciones, fmtN } from './util.js';
+import { variado } from '../lib/variedad.js';
 
 const useSay = (text, deps = []) => {
   useEffect(() => {
@@ -19,7 +20,7 @@ const stepFor = (max) => (max >= 1000 ? pick([1, 10, 100, 1000]) : max >= 100 ? 
 // ---------------------------------------------------------------------------
 export function Tesoro({ level, onAnswer }) {
   const [st] = useState(() => {
-    const n = rnd(level.min || 1, level.max);
+    const n = variado(`tesoro${level.id}`, () => rnd(level.min || 1, level.max), (x) => x, 5);
     return { n, ops: opciones(n, 4, { step: stepFor(level.max), spread: 3, min: 1, max: level.max }) };
   });
   const [abierto, setAbierto] = useState(null);
@@ -53,6 +54,9 @@ export function Tesoro({ level, onAnswer }) {
 }
 Tesoro.meta = {
   levels: [
+    { id: 't10', label: 'Hasta 10', max: 10 },
+    { id: 't50', label: 'Hasta 50', max: 50, min: 10 },
+    { id: 't200', label: 'Hasta 200', max: 200, min: 50 },
     { id: 't20', label: 'Hasta 20', max: 20 },
     { id: 't100', label: 'Hasta 100', max: 100, min: 10 },
     { id: 't1000', label: 'Hasta 1.000', max: 1000, min: 100 },
@@ -68,8 +72,8 @@ const WAGON_COLORS = ['#E8412C', '#2F8FD8', '#2E9E5B', '#F2A20C', '#7A4FD6', '#E
 export function Tren({ level, onAnswer, onStep }) {
   const [st] = useState(() => {
     if (level.missing) {
-      const step = pick([1, 2, 5, 10]);
-      const start = rnd(0, level.max - step * 5);
+      const step = pick(level.steps || [1, 2, 5, 10]);
+      const start = rnd(0, Math.max(0, level.max - step * 5));
       const seq = Array.from({ length: 5 }, (_, i) => start + i * step);
       const hole = rnd(1, 3);
       return { seq, hole, ops: opciones(seq[hole], 3, { step, spread: 2, min: 0, max: level.max + 50 }) };
@@ -145,6 +149,9 @@ export function Tren({ level, onAnswer, onStep }) {
 }
 Tren.meta = {
   levels: [
+    { id: 'r4p', label: '4 vagones (hasta 20)', n: 4, max: 20 },
+    { id: 'r5j', label: '5 vagones (hasta 200)', n: 5, max: 200 },
+    { id: 'rmp', label: 'El vagón perdido (hasta 20)', missing: true, max: 20, steps: [1] },
     { id: 'r3', label: '3 vagones (hasta 10)', n: 3, max: 10 },
     { id: 'r4', label: '4 vagones (hasta 100)', n: 4, max: 100 },
     { id: 'r5', label: '5 vagones (hasta 1.000)', n: 5, max: 1000 },
@@ -176,7 +183,7 @@ function Monster({ mood }) {
 }
 
 export function Monstruo({ level, onAnswer, onStep }) {
-  const [target] = useState(() => rnd(level.min || 2, level.max));
+  const [target] = useState(() => variado(`mon${level.id}`, () => rnd(level.min || 2, level.max), (x) => x, 5));
   const [c, setC] = useState(0);
   const [mood, setMood] = useState('hungry');
   const [msg, setMsg] = useState('');
@@ -227,6 +234,7 @@ export function Monstruo({ level, onAnswer, onStep }) {
 Monstruo.meta = {
   levels: [
     { id: 'm10', label: 'Hasta 10', max: 10 },
+    { id: 'm20', label: 'Hasta 20 (paquetes de 10)', max: 20, min: 11, packs: true },
     { id: 'm30', label: 'Hasta 30 (paquetes de 10)', max: 30, min: 11, packs: true },
     { id: 'm100', label: 'Hasta 100 (paquetes de 10)', max: 100, min: 20, packs: true },
   ],
@@ -285,7 +293,9 @@ Mision.meta = {
   rounds: ROCKET_PARTS,
   levels: [
     { id: 's1', label: 'De 1 en 1', steps: [1], max: 20 },
+    { id: 's10p', label: 'De 10 en 10 (hasta 50)', steps: [10], max: 50 },
     { id: 's2', label: 'De 2, 5 y 10', steps: [2, 5, 10], max: 100 },
+    { id: 's2j', label: 'De 2 en 2 y de 5 en 5 (hasta 200)', steps: [2, 5], max: 200 },
     { id: 's3', label: 'De 100 en 100', steps: [100], max: 1000 },
     { id: 's4', label: 'De 1.000 en 1.000', steps: [1000], max: 10000 },
     { id: 's5', label: 'Hacia atrás', steps: [1, 2, 10], back: true, max: 50 },
@@ -303,7 +313,7 @@ const PLACES = [
 ];
 export function Construye({ level, onAnswer }) {
   const places = PLACES.filter((p) => level.places.includes(p.k));
-  const [target] = useState(() => rnd(level.min, level.max));
+  const [target] = useState(() => variado(`cons${level.id}`, () => rnd(level.min, level.max), (x) => x, 5));
   const [cnt, setCnt] = useState({ m: 0, h: 0, t: 0, u: 0 });
   const built = cnt.m * 1000 + cnt.h * 100 + cnt.t * 10 + cnt.u;
   useSay(`Construye el número ${toSpanish(target)}`);
@@ -336,7 +346,9 @@ export function Construye({ level, onAnswer }) {
 Construye.meta = {
   rounds: 6,
   levels: [
+    { id: 'c1', label: 'Hasta 50', places: ['t', 'u'], min: 11, max: 50 },
     { id: 'c2', label: 'Hasta 99', places: ['t', 'u'], min: 11, max: 99 },
+    { id: 'c2j', label: 'Hasta 200', places: ['h', 't', 'u'], min: 100, max: 199 },
     { id: 'c3', label: 'Hasta 999', places: ['h', 't', 'u'], min: 101, max: 999 },
     { id: 'c4', label: 'Hasta 9.999', places: ['m', 'h', 't', 'u'], min: 1001, max: 9999 },
   ],
@@ -347,7 +359,7 @@ Construye.meta = {
 // ---------------------------------------------------------------------------
 export function Cocodrilo({ level, onAnswer }) {
   const [st] = useState(() => {
-    const a = rnd(level.min || 1, level.max);
+    const a = variado(`croc${level.id}`, () => rnd(level.min || 1, level.max), (x) => x, 4);
     let b = rnd(level.min || 1, level.max);
     if (level.iguales && Math.random() < 0.2) b = a;
     while (b === a && !level.iguales) b = rnd(level.min || 1, level.max);
@@ -381,7 +393,10 @@ export function Cocodrilo({ level, onAnswer }) {
 Cocodrilo.meta = {
   levels: [
     { id: 'k10', label: 'Hasta 10 (con puntos)', max: 10, dots: true },
+    { id: 'k20', label: 'Hasta 20', max: 20 },
+    { id: 'k50', label: 'Hasta 50', max: 50 },
     { id: 'k100', label: 'Hasta 100', max: 100 },
+    { id: 'k200', label: 'Hasta 200', max: 200, iguales: true },
     { id: 'k1000', label: 'Hasta 1.000', max: 1000, min: 100, iguales: true },
     { id: 'k10000', label: 'Hasta 10.000', max: 10000, min: 1000, iguales: true },
   ],

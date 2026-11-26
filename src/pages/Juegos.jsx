@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ISLAS, JUEGOS, juegoPorId } from '../games/index.js';
+import { islasDeGrado, juegoDeGrado } from '../games/index.js';
+import { useGrado } from '../lib/grado.js';
 import GameShell from '../games/GameShell.jsx';
 import Chispa from '../components/Chispa.jsx';
 import { sfx } from '../lib/sfx.js';
@@ -7,17 +8,21 @@ import { speak } from '../lib/speech.js';
 
 export function JuegosHub() {
   const nav = useNavigate();
+  const { g, to } = useGrado();
+  const ISLAS = islasDeGrado(g.id);
+  const JUEGOS = ISLAS.flatMap((i) => i.juegos);
   const sorpresa = () => {
     sfx.chest();
     const j = JUEGOS[Math.floor(Math.random() * JUEGOS.length)];
-    nav(`/juegos/${j.id}`);
+    nav(to(`/juegos/${j.id}`));
   };
   return (
     <div className="page page-juegos">
       <section className="world-header wh-juegos">
         <div>
           <h1>La Isla del Conocimiento</h1>
-          <p>{JUEGOS.length} juegos en 5 islas. Cada juego tiene niveles, combos y monedas para el cofre.</p>
+          <span className="grado-pill">{g.icono} {g.nombre}</span>
+          <p>{JUEGOS.length} juegos en {ISLAS.length} islas, con niveles pensados para {g.nombre}. Combos, monedas y estrellas.</p>
           <div className="deck-actions">
             <button className="btn btn-xl btn-gold" onClick={sorpresa}>🎲 ¡Juego sorpresa!</button>
           </div>
@@ -46,7 +51,7 @@ export function JuegosHub() {
           </header>
           <div className="game-grid">
             {isla.juegos.map((j, k) => (
-              <Link key={j.id} to={`/juegos/${j.id}`} className="game-card" style={{ '--gc': j.color, animationDelay: `${k * 60}ms` }} onMouseEnter={() => sfx.tap()} onClick={() => sfx.pop()}>
+              <Link key={j.id} to={to(`/juegos/${j.id}`)} className="game-card" style={{ '--gc': j.color, animationDelay: `${k * 60}ms` }} onMouseEnter={() => sfx.tap()} onClick={() => sfx.pop()}>
                 <span className="gc-icon">{j.icon}</span>
                 <b>{j.titulo}</b>
                 <small>{j.evalua}</small>
@@ -62,7 +67,8 @@ export function JuegosHub() {
 
 export function JuegoPage() {
   const { id } = useParams();
-  const game = juegoPorId(id);
-  if (!game) return <div className="page"><p>Juego no encontrado. <Link to="/juegos">Volver</Link></p></div>;
-  return <div className="page page-juego"><GameShell game={game} key={id} /></div>;
+  const { g, to } = useGrado();
+  const game = juegoDeGrado(g.id, id);
+  if (!game) return <div className="page"><p>Este juego no está en {g.nombre}. <Link to={to('/juegos')}>Ver los juegos</Link></p></div>;
+  return <div className="page page-juego"><GameShell game={game} key={`${g.id}-${id}`} /></div>;
 }

@@ -106,6 +106,7 @@ export default function DeckView({ hero, title, items, lang = 'es', color = '#E8
                 <span className="flip-face flip-front">
                   {img ? <Visual item={it} className="card-visual" /> : it.letra && <span className="card-letter">{settings.upper ? it.letra.toUpperCase() : it.letra}</span>}
                   <Word text={it.texto} letra={it.letra} upper={settings.upper} className={img ? 'card-word' : 'card-word-big'} />
+                  {it.es && <small className="card-es">{it.es}</small>}
                 </span>
                 <span className="flip-face flip-back">
                   <Word text={it.texto} letra={it.letra} upper={settings.upper} className="card-word-big" />

@@ -5,6 +5,8 @@ import { speak, stopSpeech } from '../lib/speech.js';
 import { sfx } from '../lib/sfx.js';
 import { bigCelebration } from '../lib/fx.js';
 import Chispa from '../components/Chispa.jsx';
+import { useGrado } from '../lib/grado.js';
+import { Link } from 'react-router-dom';
 
 // =====================================================================
 //  LECTOR COHETE — teleprompter de lectura rápida
@@ -254,9 +256,11 @@ function Lectura({ texto, titulo, lang = 'es', cfg, setCfg, onClose }) {
 // Página: escribir / escoger texto y ajustes
 // ---------------------------------------------------------------------
 export default function Lector() {
+  const { g, to } = useGrado();
+  const LIBRO = [...g.lecturas, EJEMPLOS.find((x) => x.lang === 'en')];
   const [st, setSt] = useState(load);
-  const [titulo, setTitulo] = useState('');
-  const [texto, setTexto] = useState(EJEMPLOS[0].texto);
+  const [titulo, setTitulo] = useState(LIBRO[0].titulo);
+  const [texto, setTexto] = useState(LIBRO[0].texto);
   const [lang, setLang] = useState('es');
   const [leyendo, setLeyendo] = useState(false);
 
@@ -279,11 +283,15 @@ export default function Lector() {
     <div className="page page-lector">
       <section className="world-header wh-lector">
         <div>
+          <span className="grado-pill">{g.icono} {g.nombre}</span>
           <h1>Lector Cohete</h1>
           <p>Teleprompter de lectura rápida: escribe un texto, escoge el tamaño y la velocidad, y cada palabra se ilumina mientras corre el cronómetro.</p>
         </div>
         <Chispa size={130} message="¡3, 2, 1… a leer!" />
       </section>
+      <div className="row gap wrap" style={{ marginTop: 16 }}>
+        <Link to={to('/letras')} className="btn btn-white">⟵ Volver a Letras</Link>
+      </div>
 
       <div className="lector-setup">
         <section className="panel">
@@ -341,7 +349,7 @@ export default function Lector() {
         </section>
 
         <section className="panel panel-wide">
-          <h2>📚 Textos</h2>
+          <h2>📚 Lecturas del libro de {g.nombre}</h2>
           <div className="textos-grid">
             {st.textos.map((x) => (
               <div key={x.id} className="texto-card mine" onClick={() => cargar(x)}>
@@ -350,11 +358,11 @@ export default function Lector() {
                 <button className="ci-del" onClick={(e) => { e.stopPropagation(); borrar(x.id); }} aria-label="Borrar">✕</button>
               </div>
             ))}
-            {EJEMPLOS.map((x) => (
-              <div key={x.id} className="texto-card" onClick={() => cargar(x)}>
+            {LIBRO.map((x) => (
+              <div key={x.id} className={`texto-card ${titulo === x.titulo ? 'sel' : ''}`} onClick={() => cargar(x)}>
                 <b>{x.titulo}</b>
                 <small>{x.texto.slice(0, 70)}…</small>
-                <i>ejemplo</i>
+                <i>{x.libro ? `libro ${g.corto}` : 'English'}</i>
               </div>
             ))}
           </div>

@@ -1,16 +1,19 @@
 import { Link, useParams } from 'react-router-dom';
 import { useState } from 'react';
-import { ENGLISH } from '../data/english.js';
+import { englishDeGrado } from '../data/english.js';
+import { useGrado } from '../lib/grado.js';
 import { speak } from '../lib/speech.js';
 import { sfx } from '../lib/sfx.js';
 import DeckView from '../components/DeckView.jsx';
 import BitPlayer from '../components/BitPlayer.jsx';
 import Chispa from '../components/Chispa.jsx';
 
-const ALL = ENGLISH.flatMap((c) => c.items);
 const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
 
 export function EnglishHome() {
+  const { g, to } = useGrado();
+  const ENGLISH = englishDeGrado(g.id);
+  const ALL = ENGLISH.flatMap((c) => c.items);
   const [mix, setMix] = useState(null);
   return (
     <div className="page page-english">
@@ -29,7 +32,7 @@ export function EnglishHome() {
         {ENGLISH.map((c, i) => (
           <Link
             key={c.id}
-            to={`/english/${c.id}`}
+            to={to(`/english/${c.id}`)}
             className="island"
             style={{ '--c': c.color, animationDelay: `${i * 50}ms` }}
             onMouseEnter={() => sfx.tap()}
@@ -49,8 +52,9 @@ export function EnglishHome() {
 
 export function EnglishCategory() {
   const { cat } = useParams();
-  const data = ENGLISH.find((c) => c.id === cat);
-  if (!data) return <div className="page"><p>Not found. <Link to="/english">Back</Link></p></div>;
+  const { g, to } = useGrado();
+  const data = englishDeGrado(g.id).find((c) => c.id === cat);
+  if (!data) return <div className="page"><p>Not found. <Link to={to('/english')}>Back</Link></p></div>;
   const hero = (
     <button className="giant-icon" style={{ '--c': data.color }} onClick={() => speak(data.titulo, 'en')}>
       <span>{data.icon}</span>
@@ -59,7 +63,7 @@ export function EnglishCategory() {
   return (
     <div className="page">
       <DeckView key={cat} hero={hero} title={data.titulo} items={data.items} lang="en" color={data.color} />
-      <nav className="letter-nav"><Link to="/english" className="btn btn-white">⟵ All worlds</Link></nav>
+      <nav className="letter-nav"><Link to={to('/english')} className="btn btn-white">⟵ All worlds</Link></nav>
     </div>
   );
 }

@@ -9,15 +9,22 @@ import {
 } from '../components/Numbers.jsx';
 import { toSpanish } from '../lib/numbers.js';
 import { sfx } from '../lib/sfx.js';
+import { speak } from '../lib/speech.js';
+import { useGrado } from '../lib/grado.js';
+import { RelojExplorer, FORMAS, Forma, DineroExplorer, BondsExplorer } from '../components/Mate.jsx';
 
 const TABS = [
   { id: 'puntos', label: 'Puntos 1–20', icon: '🔴' },
   { id: 'singapur', label: 'Bloques Singapur', icon: '🧱' },
   { id: 'numerales', label: 'Bits de números', icon: '🔢' },
-  { id: 'explorar', label: 'Explorador 0–10.000', icon: '🔭' },
+  { id: 'explorar', label: 'Explorador', icon: '🔭' },
+  { id: 'vinculos', label: 'Vínculos', icon: '🔗' },
   { id: 'suma', label: 'Sumas', icon: '➕' },
   { id: 'resta', label: 'Restas', icon: '➖' },
-  { id: 'multi', label: 'Multiplicar', icon: '✖️' },
+  { id: 'multi', label: 'Multiplicar', icon: '✖️', si: (g) => g.numeros.tablas.length > 0 },
+  { id: 'reloj', label: 'El reloj', icon: '⏰' },
+  { id: 'formas', label: 'Geometría', icon: '🔷' },
+  { id: 'dinero', label: 'Dinero', icon: '💰', si: (g) => g.id === 't' },
   { id: 'cuantos', label: '¿Cuántos hay?', icon: '🎯' },
 ];
 
@@ -36,20 +43,25 @@ const DOT_SETS = [
 
 // De ahí en adelante: método Singapur con bloques
 const BLOCK_SETS = [
-  { label: '21 al 100', items: () => sample(21, 100, 12), demo: 47, c: '#2F8FD8' },
-  { label: 'Decenas 10…100', items: () => numberItems(10, 100, 10), demo: 30, c: '#1D2A6B' },
-  { label: 'Hasta 1.000', items: () => sample(100, 999, 12), demo: 235, c: '#E8412C' },
-  { label: 'Miles 1.000…10.000', items: () => numberItems(1000, 10000, 1000), demo: 2000, c: '#7A4FD6' },
-  { label: 'Hasta 10.000', items: () => sample(1000, 9999, 10), demo: 1342, c: '#2E9E5B' },
+  { label: '21 al 50', items: () => sample(21, 50, 12), demo: 34, c: '#E0598B', hasta: 50 },
+  { label: '21 al 100', items: () => sample(21, 100, 12), demo: 47, c: '#2F8FD8', hasta: 100, desde: 100 },
+  { label: 'Decenas 10…100', items: () => numberItems(10, 100, 10), demo: 30, c: '#1D2A6B', hasta: 100, desde: 50 },
+  { label: 'Hasta 200', items: () => sample(100, 200, 12), demo: 125, c: '#F26B1D', hasta: 200, desde: 200 },
+  { label: 'Hasta 1.000', items: () => sample(100, 999, 12), demo: 235, c: '#E8412C', hasta: 1000, desde: 1000 },
+  { label: 'Miles 1.000…10.000', items: () => numberItems(1000, 10000, 1000), demo: 2000, c: '#7A4FD6', hasta: 10000, desde: 10000 },
+  { label: 'Hasta 10.000', items: () => sample(1000, 9999, 10), demo: 1342, c: '#2E9E5B', hasta: 10000, desde: 10000 },
 ];
 
 const NUM_SETS = [
-  { label: '0 al 20', items: () => numberItems(0, 20) },
-  { label: 'Decenas 10…100', items: () => numberItems(10, 100, 10) },
-  { label: 'Centenas 100…1.000', items: () => numberItems(100, 1000, 100) },
-  { label: 'Miles 1.000…10.000', items: () => numberItems(1000, 10000, 1000) },
-  { label: 'Sorpresa hasta 10.000', items: () => sample(1, 10000, 12) },
+  { label: '0 al 20', items: () => numberItems(0, 20), demo: 7, hasta: 20 },
+  { label: '21 al 50', items: () => numberItems(21, 50), demo: 34, hasta: 50 },
+  { label: 'Decenas 10…100', items: () => numberItems(10, 100, 10), demo: 40, hasta: 100, desde: 100 },
+  { label: 'Centenas 100…1.000', items: () => numberItems(100, 1000, 100), demo: 300, hasta: 1000, desde: 1000 },
+  { label: 'Hasta 200', items: () => sample(100, 200, 12), demo: 168, hasta: 200, desde: 200 },
+  { label: 'Miles 1.000…10.000', items: () => numberItems(1000, 10000, 1000), demo: 2000, hasta: 10000, desde: 10000 },
+  { label: 'Sorpresa', items: null, demo: 85, hasta: 50 },
 ];
+const FILL = ['#1D2A6B', '#7A4FD6', '#E8412C', '#2E9E5B', '#F26B1D', '#2F8FD8', '#E0598B'];
 
 const visualFor = (n, cls = '') => (n <= 20 && n > 0
   ? <DotCard n={n} className={`num-back-dots ${cls}`} />
@@ -68,6 +80,11 @@ function equationBits(op) {
 }
 
 export default function Numeros() {
+  const { g, to } = useGrado();
+  const max = g.numeros.max;
+  const tabs = TABS.filter((t) => !t.si || t.si(g));
+  const bloques = BLOCK_SETS.filter((x) => x.hasta <= max && (!x.desde || x.desde <= max));
+  const numSets = NUM_SETS.filter((x) => x.hasta <= max && (!x.desde || x.desde <= max)).map((x) => (x.items ? x : { ...x, label: `Sorpresa hasta ${max.toLocaleString('es-CO')}`, items: () => sample(1, max, 12) }));
   const [tab, setTab] = useState('puntos');
   const [overlay, setOverlay] = useState(null);
   const [order, setOrder] = useState('azar');
@@ -148,8 +165,9 @@ export default function Numeros() {
     });
   };
 
-  const openCuantos = (mode, max) => {
-    const pool = mode === 'puntos' ? numberItems(1, max) : sample(max === 100 ? 11 : max === 1000 ? 100 : 1000, max === 10000 ? 9999 : max, 40);
+  const openCuantos = (mode, hasta) => {
+    const desde = { 50: 21, 100: 21, 200: 50, 1000: 100, 10000: 1000 }[hasta] || 1;
+    const pool = mode === 'puntos' ? numberItems(1, hasta) : sample(desde, hasta === 10000 ? 9999 : hasta, 40);
     setOverlay({ quiz: true, pool, mode });
   };
 
@@ -158,18 +176,19 @@ export default function Numeros() {
       <section className="world-header wh-numeros">
         <div>
           <h1>Mundo de Números</h1>
-          <p>Puntos de Glenn Doman hasta el 20, método Singapur hasta el 10.000, operaciones y tablas</p>
+          <span className="grado-pill">{g.icono} {g.nombre}</span>
+          <p>{g.numeros.temas}</p>
         </div>
         <Chispa size={140} message="¡Contemos juntos!" />
       </section>
 
       <nav className="tabs">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button key={t.id} className={`tab ${tab === t.id ? 'on' : ''}`} onClick={() => { sfx.tap(); setTab(t.id); }}>
             <span>{t.icon}</span>{t.label}
           </button>
         ))}
-        <Link to="/juegos" className="tab tab-games"><span>🎮</span>Juegos de números</Link>
+        <Link to={to('/juegos')} className="tab tab-games"><span>🎮</span>Juegos de números</Link>
       </nav>
 
       <section className="tab-panel" key={tab}>
@@ -207,7 +226,7 @@ export default function Numeros() {
                 Primero aparecen los bloques, luego el número y cómo se lee.
               </p>
             </div>
-            {BLOCK_SETS.map((s) => (
+            {bloques.map((s) => (
               <button key={s.label} className="set-card" style={{ '--c': s.c }} onClick={() => { sfx.pop(); openBlocks(s); }}>
                 <div className="set-blocks"><Base10 n={s.demo} compact showLabels={false} /></div>
                 <b>{s.label}</b>
@@ -223,9 +242,9 @@ export default function Numeros() {
               <h2>Así se escriben</h2>
               <p>Cada cifra tiene su color: <b className="t-m">miles</b>, <b className="t-c">centenas</b>, <b className="t-d">decenas</b> y <b className="t-u">unidades</b>.</p>
             </div>
-            {NUM_SETS.map((s, i) => (
-              <button key={s.label} className="set-card" style={{ '--c': ['#1D2A6B', '#7A4FD6', '#E8412C', '#2E9E5B', '#F26B1D'][i] }} onClick={() => { sfx.pop(); openNums(s); }}>
-                <Numeral n={[7, 40, 300, 2000, 8571][i]} className="set-numeral" />
+            {numSets.map((s, i) => (
+              <button key={s.label} className="set-card" style={{ '--c': FILL[i % FILL.length] }} onClick={() => { sfx.pop(); openNums(s); }}>
+                <Numeral n={s.demo} className="set-numeral" />
                 <b>{s.label}</b>
                 <small>▶ Empezar</small>
               </button>
@@ -233,18 +252,59 @@ export default function Numeros() {
           </div>
         )}
 
-        {tab === 'explorar' && <NumberExplorer />}
+        {tab === 'explorar' && <NumberExplorer max={max} />}
 
         {(tab === 'suma' || tab === 'resta') && (
           <>
-            <OperationGame op={tab === 'suma' ? '+' : '-'} key={tab} />
+            <OperationGame op={tab === 'suma' ? '+' : '-'} key={tab} ids={g.numeros.ops} />
             <div className="center-row">
               <button className="btn btn-xl btn-accent" onClick={() => openEq(tab === 'suma' ? '+' : '-')}>⚡ Bits de {tab === 'suma' ? 'sumas' : 'restas'} con puntos</button>
             </div>
           </>
         )}
 
-        {tab === 'multi' && <MultiplicationExplorer onBits={openTabla} />}
+        {tab === 'multi' && <MultiplicationExplorer onBits={openTabla} tablas={g.numeros.tablas} />}
+        {tab === 'vinculos' && (
+          <div className="panel-intro center">
+            <h2>Vínculos numéricos (Number bonds)</h2>
+            <p>Parte + parte = todo. Mueve la barra para descomponer el número.</p>
+            <BondsExplorer max={g.numeros.bonds} />
+          </div>
+        )}
+        {tab === 'reloj' && <RelojExplorer media={g.id === 't'} />}
+        {tab === 'dinero' && <DineroExplorer />}
+        {tab === 'formas' && (
+          <div className="formas-panel">
+            <div className="panel-intro">
+              <h2>Geometric shapes · Figuras geométricas</h2>
+              <p>Toca cada figura para escuchar su nombre en inglés y en español.</p>
+              <div className="row gap wrap" style={{ marginTop: 12 }}>
+                <button className="btn btn-xl btn-accent" onClick={() => setOverlay({
+                  title: 'Shapes', lang: 'en', items: FORMAS.map((f) => ({ texto: f.en, f })),
+                  renderFront: (it) => <Forma id={it.f.id} size={340} />,
+                  renderBack: (it) => <span className="num-back"><span className="num-back-w big">{it.f.en}</span><span className="num-back-w">{it.f.es}</span></span>,
+                })}>⚡ Bits de figuras</button>
+                <Link to={to('/juegos/formas')} className="btn btn-xl btn-gold">🎮 Juego de figuras</Link>
+              </div>
+            </div>
+            {['2d', '3d'].map((tipo) => (
+              <div key={tipo}>
+                <h2 className="section-title"><span>{tipo === '2d' ? 'Flat shapes (2D)' : 'Solid shapes (3D)'}</span></h2>
+                <div className="formas-grid">
+                  {FORMAS.filter((f) => f.tipo === tipo).map((f) => (
+                    <button key={f.id} className="forma-card" onClick={() => { sfx.pop(); speak(f.en, 'en'); setTimeout(() => speak(f.es), 1100); }}>
+                      <Forma id={f.id} size={120} />
+                      <b>{f.en}</b>
+                      <small>{f.es}</small>
+                      {f.tipo === '2d' && <i>{f.lados} sides · {f.esquinas} corners</i>}
+                      <span className="forma-obj">{f.objetos.join(' ')}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {tab === 'cuantos' && (
           <div className="panel-intro center">
@@ -253,9 +313,9 @@ export default function Numeros() {
             <div className="row gap wrap" style={{ justifyContent: 'center' }}>
               <button className="btn btn-xl btn-accent" onClick={() => openCuantos('puntos', 10)}>🔴 Puntos hasta 10</button>
               <button className="btn btn-xl btn-accent" onClick={() => openCuantos('puntos', 20)}>🔴 Puntos hasta 20</button>
-              <button className="btn btn-xl btn-blue" onClick={() => openCuantos('bloques', 100)}>🧱 Bloques hasta 100</button>
-              <button className="btn btn-xl btn-blue" onClick={() => openCuantos('bloques', 1000)}>🧱 Hasta 1.000</button>
-              <button className="btn btn-xl btn-blue" onClick={() => openCuantos('bloques', 10000)}>🧱 Hasta 10.000</button>
+              {[50, 100, 200, 1000, 10000].filter((h) => h <= max && !(h === 50 && max > 50)).map((h) => (
+                <button key={h} className="btn btn-xl btn-blue" onClick={() => openCuantos('bloques', h)}>🧱 Bloques hasta {h.toLocaleString('es-CO')}</button>
+              ))}
             </div>
           </div>
         )}
@@ -267,6 +327,7 @@ export default function Numeros() {
           title={overlay.title}
           renderFront={overlay.renderFront}
           renderBack={overlay.renderBack}
+          lang={overlay.lang || 'es'}
           onClose={() => setOverlay(null)}
         />
       )}

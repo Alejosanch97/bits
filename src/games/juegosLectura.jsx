@@ -6,11 +6,12 @@ import { ENGLISH } from '../data/english.js';
 import Visual, { Word } from '../components/Visual.jsx';
 import { baseLetter } from '../lib/slug.js';
 import { pick, shuffle } from './util.js';
+import { variado } from '../lib/variedad.js';
 import { useStore } from '../lib/store.jsx';
 
 const EN_POOL = ENGLISH.flatMap((c) => c.items).filter((i) => i.emoji);
 const ES_SIMPLE = PALABRAS_CON_IMAGEN.filter((p) => !p.texto.includes(' ') && p.texto.length <= 9);
-const poolDe = (level) => (level.lang === 'en' ? EN_POOL : ES_SIMPLE);
+const poolDe = (level) => (level.lang === 'en' ? EN_POOL : (level.vocab || ES_SIMPLE).filter((p) => !p.texto.includes(' ')));
 
 // Escoge n palabras distintas (texto e imagen distintos)
 function escoger(pool, n, extra = () => true) {
@@ -32,7 +33,7 @@ export function Relampago({ level, onAnswer }) {
   const { settings } = useStore();
   const ms = level.ms || 1500;
   const [st] = useState(() => {
-    const ops = escoger(poolDe(level), level.n || 3);
+    const ops = variado(`rel${level.id}`, () => escoger(poolDe(level), level.n || 3), (o) => o.map((x) => x.texto).sort().join(), 3);
     return { ops, target: pick(ops) };
   });
   const [fase, setFase] = useState('listos');
@@ -158,8 +159,8 @@ export function Detective({ level, onAnswer }) {
   const { settings } = useStore();
   const n = level.n || 8;
   const [st] = useState(() => {
-    const target = pick(level.lang === 'en' ? EN_POOL : ES_SIMPLE);
-    const base = level.lang === 'en' ? EN_POOL : ALL_WORDS;
+    const target = variado(`det${level.id}`, () => pick(poolDe(level)), (x) => x.texto, 6);
+    const base = level.lang === 'en' ? EN_POOL : (level.vocabTodo || ALL_WORDS).filter((p) => !p.texto.includes(' ') && p.texto.length <= 10);
     const ini = baseLetter(target.texto[0]);
     // distractores que se parecen: empiezan con la misma letra
     const parecidas = shuffle(base.filter((p) => p.texto !== target.texto && baseLetter(p.texto[0]) === ini));
@@ -214,8 +215,8 @@ Detective.meta = {
 export function ConstruyePalabra({ level, onAnswer, onStep }) {
   const { settings } = useStore();
   const [st] = useState(() => {
-    const pool = ES_SIMPLE.filter((p) => p.texto.length >= level.min && p.texto.length <= level.max);
-    const w = pick(pool);
+    const pool = poolDe(level).filter((p) => p.texto.length >= level.min && p.texto.length <= level.max && !/[A-Z]/.test(p.texto[0]));
+    const w = variado(`cpal${level.id}`, () => pick(pool.length ? pool : ES_SIMPLE), (x) => x.texto, 6);
     const letras = [...w.texto];
     const extra = level.extra ? shuffle([...'aeioumpslt']).filter((x) => !letras.includes(x)).slice(0, level.extra) : [];
     return { w, letras, tiles: shuffle([...letras, ...extra].map((ch, i) => ({ ch, id: i }))) };

@@ -4,6 +4,7 @@ import { speak } from '../lib/speech.js';
 import { sfx } from '../lib/sfx.js';
 import { Numeral, TenFrames } from '../components/Numbers.jsx';
 import { rnd, pick, opciones, fmtN } from './util.js';
+import { variado } from '../lib/variedad.js';
 
 const useSay = (text, deps = []) => {
   useEffect(() => {
@@ -22,21 +23,38 @@ function Opciones({ ops, ans, onAnswer, disabled, cls = '' }) {
   );
 }
 
-function genOp(level) {
+function genOp1(level) {
   const op = pick(level.ops);
+  if (level.kind === 'dos') {
+    if (op === '+') { const a1 = rnd(1, 7); const b1 = rnd(1, 8 - a1); const a0 = rnd(0, 8); const b0 = rnd(0, 9 - a0); return { op, a: a1 * 10 + a0, b: b1 * 10 + b0 }; }
+    const a1 = rnd(2, 9); const b1 = rnd(1, a1 - 1); const a0 = rnd(1, 9); const b0 = rnd(0, a0); return { op, a: a1 * 10 + a0, b: b1 * 10 + b0 };
+  }
+  if (level.kind === 'llevar') { const a0 = rnd(2, 9); const b0 = rnd(10 - a0, 9); const a1 = rnd(1, 7); const b1 = rnd(1, 8 - a1); return { op: '+', a: a1 * 10 + a0, b: b1 * 10 + b0 }; }
+  if (level.kind === 'prestar') { const a1 = rnd(3, 9); const b1 = rnd(1, a1 - 1); const a0 = rnd(0, 7); const b0 = rnd(a0 + 1, 9); return { op: '-', a: a1 * 10 + a0, b: b1 * 10 + b0 }; }
   const u = level.unit || 1;
   const max = Math.round(level.max / u);
   let a; let b;
   if (op === '+') { a = rnd(1, max - 1); b = rnd(1, max - a); } else { a = rnd(2, max); b = rnd(1, a - 1); }
-  a *= u; b *= u;
-  const ans = op === '+' ? a + b : a - b;
-  return { op, a, b, ans, ops: opciones(ans, 3, { step: u, spread: 3, min: 0, max: level.max + u * 3 }) };
+  return { op, a: a * u, b: b * u };
+}
+
+function genOp(level) {
+  const x = variado(`op${level.id}`, () => genOp1(level), (y) => (y.op === '+' ? y.a + y.b : y.a - y.b), 3);
+  const ans = x.op === '+' ? x.a + x.b : x.a - x.b;
+  const u = level.kind ? 1 : level.unit || 1;
+  const spread = level.kind ? 9 : 3;
+  return { ...x, ans, ops: opciones(ans, 3, { step: u, spread, min: 0, max: (level.max || 200) + u * 3 }) };
 }
 
 const OP_LEVELS = [
+  { id: 'o5', label: 'Sumas hasta 5', ops: ['+'], max: 5 },
+  { id: 'o5r', label: 'Sumas y restas hasta 10', ops: ['+', '-'], max: 10 },
   { id: 'o10', label: 'Sumas hasta 10', ops: ['+'], max: 10 },
   { id: 'o20', label: 'Sumas y restas hasta 20', ops: ['+', '-'], max: 20 },
   { id: 'o100', label: 'Decenas hasta 100', ops: ['+', '-'], max: 100, unit: 10 },
+  { id: 'o2c', label: 'Dos cifras sin llevar', ops: ['+', '-'], kind: 'dos', max: 99 },
+  { id: 'oll', label: 'Sumas llevando', ops: ['+'], kind: 'llevar', max: 99 },
+  { id: 'opr', label: 'Restas prestando', ops: ['-'], kind: 'prestar', max: 99 },
   { id: 'o1000', label: 'Centenas hasta 1.000', ops: ['+', '-'], max: 1000, unit: 100 },
 ];
 
@@ -45,8 +63,7 @@ const OP_LEVELS = [
 // ---------------------------------------------------------------------------
 export function Mono({ level, onAnswer, onStep }) {
   const [st] = useState(() => {
-    const a = rnd(1, Math.floor(level.max / 2));
-    const b = rnd(1, level.max - a);
+    const { a, b } = variado(`mono${level.id}`, () => { const x = rnd(1, Math.floor(level.max / 2)); return { a: x, b: rnd(1, level.max - x) }; }, (y) => y.a + y.b, 4);
     return { a, b, ops: opciones(a + b, 3, { min: 1, max: level.max + 3 }) };
   });
   const [moved, setMoved] = useState(0);
@@ -96,8 +113,12 @@ Mono.meta = { levels: [{ id: 'mo10', label: 'Hasta 10', max: 10 }, { id: 'mo20',
 // ---------------------------------------------------------------------------
 export function Patitos({ level, onAnswer }) {
   const [st] = useState(() => {
-    const n = rnd(3, level.max);
-    const k = rnd(1, n - 1);
+    // primero se escoge cuántos quedan (variado) y luego cuántos se van
+    const { n, k } = variado(`patos${level.id}`, () => {
+      const quedan = rnd(1, level.max - 2);
+      const van = rnd(1, Math.min(level.max - quedan, 9));
+      return { n: quedan + van, k: van };
+    }, (y) => y.n - y.k, Math.min(5, level.max - 3));
     return { n, k, ops: opciones(n - k, 3, { min: 0, max: level.max }) };
   });
   const [fase, setFase] = useState('nadan');
@@ -144,8 +165,7 @@ export function Pasteleria({ level, onAnswer, onStep }) {
       const b = rnd(1, level.max - a);
       return { a, b, total: a + b };
     }
-    const n = rnd(2, level.max);
-    return { total: n };
+    return { total: variado(`pas${level.id}`, () => rnd(2, level.max), (y) => y, 4) };
   });
   const [box, setBox] = useState(0);
   const [ok, setOk] = useState(false);

@@ -35,7 +35,9 @@ export function Word({ text, letra, upper = false, className = '' }) {
   useFitText(ref, [text, upper, className]);
   const first = text.charAt(0).toUpperCase();
   const rest = upper ? text.slice(1).toUpperCase() : text.slice(1);
-  const style = { '--len': Math.max(4, Math.ceil(text.length * (upper ? 1.35 : 1.08))) };
+  const wrap = text.includes(' ') && text.length > 16;
+  const len = wrap ? Math.min(12, Math.ceil(text.length / 2)) : text.length;
+  const style = { '--len': Math.max(4, Math.ceil(len * (upper ? 1.35 : 1.08))) };
   let idx = -1;
   if (letra) {
     for (let i = 0; i < text.length; i++) {
@@ -46,7 +48,7 @@ export function Word({ text, letra, upper = false, className = '' }) {
     ? <>{rest.slice(0, idx - 1)}<span className="word-mark">{rest[idx - 1]}</span>{rest.slice(idx)}</>
     : rest;
   return (
-    <span ref={ref} className={`word ${className}`} style={style}>
+    <span ref={ref} className={`word ${wrap ? 'wrap' : ''} ${className}`} style={style}>
       <span className="word-first">{first}</span>
       <span className="word-rest">{restNodes}</span>
     </span>

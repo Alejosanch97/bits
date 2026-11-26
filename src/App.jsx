@@ -13,6 +13,8 @@ import Profe from './pages/Profe.jsx';
 import MisBits from './pages/MisBits.jsx';
 import Lector from './pages/Lector.jsx';
 import { JuegosHub, JuegoPage } from './pages/Juegos.jsx';
+import GradoHub from './pages/GradoHub.jsx';
+import Mqrb from './pages/Mqrb.jsx';
 
 function Routed() {
   const loc = useLocation();
@@ -23,17 +25,19 @@ function Routed() {
       <main className="page-anim" key={loc.pathname}>
         <Routes location={loc}>
           <Route path="/" element={<Home />} />
-          <Route path="/letras" element={<Letras />} />
-          <Route path="/letras/:letra" element={<Letra />} />
-          <Route path="/numeros" element={<Numeros />} />
-          <Route path="/english" element={<EnglishHome />} />
-          <Route path="/english/:cat" element={<EnglishCategory />} />
+          <Route path="/g/:grado" element={<GradoHub />} />
+          <Route path="/g/:grado/letras" element={<Letras />} />
+          <Route path="/g/:grado/letras/:letra" element={<Letra />} />
+          <Route path="/g/:grado/lector" element={<Lector />} />
+          <Route path="/g/:grado/numeros" element={<Numeros />} />
+          <Route path="/g/:grado/english" element={<EnglishHome />} />
+          <Route path="/g/:grado/english/:cat" element={<EnglishCategory />} />
+          <Route path="/g/:grado/juegos" element={<JuegosHub />} />
+          <Route path="/g/:grado/juegos/:id" element={<JuegoPage />} />
+          <Route path="/mqrb" element={<Mqrb />} />
           <Route path="/premios" element={<Premios />} />
           <Route path="/profe" element={<Profe />} />
           <Route path="/mis-bits" element={<MisBits />} />
-          <Route path="/lector" element={<Lector />} />
-          <Route path="/juegos" element={<JuegosHub />} />
-          <Route path="/juegos/:id" element={<JuegoPage />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

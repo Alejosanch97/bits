@@ -14,34 +14,40 @@ npm run dev        # http://localhost:5173
 npm run build      # genera /dist para publicar (Netlify, Vercel, GitHub Pages…)
 ```
 
-## Qué trae
+## Organización por grados
 
-| Sección | Contenido |
-|---|---|
-| 🅰️ Letras | 27 letras, ~300 bits por letra en grupos de 20. Bits estilo Doman: **primera letra en MAYÚSCULA roja**, el resto en negro (minúscula o MAYÚSCULA). Sílabas, "Lee y encuentra", "Mira y lee" |
-| 🔢 Números | Puntos de Doman del 1 al 20 · método Singapur (cubitos, barras, placas y cubos de mil) hasta el 10.000 · explorador 0–10.000 con tabla UM-C-D-U · sumas y restas con marcos de 10 · tablas del 1 al 9 · "¿Cuántos hay?" |
-| 🌴 English | 17 mundos de vocabulario |
-| 🎮 Juegos | **22 juegos** en 5 islas (números, operaciones, tablas, palabras, letras) con niveles, combos, monedas y estrellas |
-| 🚀 Lector Cohete | Teleprompter: la profe escribe el texto, ajusta tamaño y velocidad; cronómetro, palabras por minuto y cada palabra se colorea. Modo automático o clic a clic |
-| ✨ Mis bits | Mazos propios con emoji o foto; Exportar/Importar; "Pasar al archivo" para dejarlos fijos en `src/data/mis-bits.js` |
-| 🎁 Premios | Cofre y álbum de 36 stickers |
-| 🍎 Profe | Monedas para la clase, velocidad, voz, MAYÚSCULAS |
+En el inicio se escoge el grado y todo queda enfocado a ese salón (contenido tomado de los libros de CREAR):
+
+| Grado | Letras | Números | Juegos |
+|---|---|---|---|
+| 🐣 **Pre-Jardín (PJ)** | o, i, a, e, u + m, s, p, l, t, n, r, b | 0–50, decena, sumas y restas hasta 10, reloj | 22 |
+| 🦁 **Jardín (J)** | abecedario completo, ce-ci, que-qui, gue-gui, ge-gi, combinaciones | 0–200, centena, < > =, series de 2 y 5, tablas 1–3 | 26 |
+| 🚀 **Transición (T)** | abecedario, sílabas, combinaciones, poemas, fábulas, comprensión | 0–10.000, llevando, prestando, tablas 1–6, dinero | 27 |
+
+Cada grado tiene: **Letras** (con frase del libro y bits de frases), **Lector Cohete** (con las lecturas del libro), **Números**, **Juegos** y **English**.
+Compartido por los tres grados: **MQRB** (My Quick Reading Book, 10 semanas, cada palabra ×4 en español e inglés), **Geometría** (figuras 2D y 3D en inglés), Mis bits, Premios y Profe.
+
+- Puntos de Glenn Doman solo del 1 al 20; del 21 en adelante, bloques del método Singapur.
+- Los juegos no repiten la misma respuesta seguida.
 
 ### Juegos
 
-- **Números:** El tesoro de los números · El tren numérico · Alimenta al monstruo · Misión espacial · Construye el número · El cocodrilo comelón
-- **Operaciones:** El mono comelón · Los patitos perdidos · La pastelería matemática · Repara al robot · Cruza el río
-- **Tablas:** Las ranas saltarinas · Fábrica de grupos · La heladería multiplicadora · El piano de las tablas
-- **Palabras:** Palabras relámpago · Parejas mágicas · El detective de palabras · Construye la palabra
-- **Letras:** El camino de las letras (trazar con el dedo) · El zoológico de los sonidos · Explota la letra
+- **Números:** tesoro, tren numérico, alimenta al monstruo, misión espacial, construye el número, cocodrilo comelón
+- **Operaciones:** mono comelón, patitos, pastelería, repara al robot, cruza el río, vínculos numéricos
+- **Tablas:** ranas saltarinas, fábrica de grupos, heladería, piano de las tablas
+- **Palabras:** palabras relámpago, parejas mágicas, detective, construye la palabra, lee y responde
+- **Letras:** camino de las letras, zoológico de sonidos, explota la letra
+- **Formas y tiempo:** figuras geométricas, ¿qué hora es?, la tiendita (pesos colombianos)
 
-Para agregar un juego: crea el componente en `src/games/` y regístralo en `src/games/index.js`.
+Los niveles de cada juego por grado están en `src/games/index.js` (objeto `NIVELES`).
 
 **En el video beam:** botón ⛶ = pantalla completa · Espacio = pausa / siguiente · ← → = anterior/siguiente · Esc = salir.
 
 ## Agregar palabras
 
-- Español: `src/data/vocabulario.js` → escribe `palabra:🦄` (o solo `palabra`) dentro de la letra.
+- Palabras de cada grado: `src/data/grados.js` → escribe `palabra:🦄` (o solo `palabra`) en la letra del grado.
+- Lecturas del Lector Cohete por grado: también en `src/data/grados.js` (`PJ_LECTURAS`, `J_LECTURAS`, `T_LECTURAS`).
+- MQRB: `src/data/mqrb.js`.
 - Bits del colegio (todos los computadores): `src/data/mis-bits.js`.
 - Inglés: `src/data/english.js` → añade `['word', '🦄']` en la categoría.
 

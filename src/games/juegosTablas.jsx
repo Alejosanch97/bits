@@ -4,6 +4,7 @@ import { speak } from '../lib/speech.js';
 import { sfx } from '../lib/sfx.js';
 import { Numeral } from '../components/Numbers.jsx';
 import { rnd, shuffle, opciones } from './util.js';
+import { variado } from '../lib/variedad.js';
 
 const useSay = (text, deps = []) => {
   useEffect(() => {
@@ -75,9 +76,7 @@ Ranas.meta = { rounds: 10, pause: 1200, levels: TABLE_LEVELS };
 // ---------------------------------------------------------------------------
 export function Grupos({ level, onAnswer, onStep }) {
   const [st] = useState(() => {
-    const n = level.mix || level.t === undefined ? rnd(2, level.nmax || 5) : level.t;
-    const g = rnd(2, level.gmax || 4);
-    return { n, g };
+    return variado(`gru${level.id}`, () => ({ n: rnd(2, level.nmax || 5), g: rnd(2, level.gmax || 4) }), (y) => y.n * y.g, 4);
   });
   const [cajas, setCajas] = useState(() => Array(st.g).fill(0));
   const [ok, setOk] = useState(false);
@@ -135,8 +134,7 @@ Grupos.meta = {
 // ---------------------------------------------------------------------------
 export function Heladeria({ level, onAnswer }) {
   const [st] = useState(() => {
-    const h = tablaDe(level);
-    const p = rnd(2, level.mix ? 5 : 6);
+    const { h, p } = variado(`hel${level.id}`, () => ({ h: tablaDe(level), p: rnd(2, level.mix ? 5 : 6) }), (y) => y.h * y.p, 4);
     return { p, h, ops: opciones(p * h, 3, { step: Math.max(1, Math.round(h / 2)), spread: 3, min: 1, max: 100 }) };
   });
   const [ok, setOk] = useState(false);

@@ -106,7 +106,7 @@ export default function GameShell({ game }) {
               </button>
             ))}
           </div>
-          <Link to="/juegos" className="btn btn-white">⟵ Todos los juegos</Link>
+          <Link to={game.base || '/'} className="btn btn-white">⟵ Todos los juegos</Link>
         </div>
       </div>
     );
@@ -115,7 +115,7 @@ export default function GameShell({ game }) {
   return (
     <div className="gshell" style={{ '--gc': game.color }}>
       <div className="gbar">
-        <Link to="/juegos" className="gbar-x" aria-label="Salir">✕</Link>
+        <Link to={game.base || '/'} className="gbar-x" aria-label="Salir">✕</Link>
         <span className="gbar-title">{game.icon} {game.titulo} <small>{level.label}</small></span>
         <div className="gbar-prog">
           {Array.from({ length: rounds }, (_, i) => <i key={i} className={i < round ? 'on' : i === round ? 'now' : ''} />)}
@@ -141,7 +141,7 @@ export default function GameShell({ game }) {
           <div className="row gap wrap" style={{ justifyContent: 'center' }}>
             <button className="btn btn-gold btn-xl" onClick={() => start(level)}>↻ Otra vez</button>
             <button className="btn btn-blue btn-xl" onClick={() => setLevel(null)}>Cambiar nivel</button>
-            <Link to="/juegos" className="btn btn-white btn-xl">🎮 Más juegos</Link>
+            <Link to={game.base || '/'} className="btn btn-white btn-xl">🎮 Más juegos</Link>
           </div>
         </div>
       )}

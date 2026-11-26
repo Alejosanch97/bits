@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../lib/store.jsx';
 import { sfx } from '../lib/sfx.js';
 import Crest from './Crest.jsx';
+import { GRADOS } from '../data/grados.js';
 
 export default function Hud() {
   const { coins, settings, setSettings } = useStore();
@@ -10,6 +11,8 @@ export default function Hud() {
   const nav = useNavigate();
   const [full, setFull] = useState(false);
   const home = loc.pathname === '/';
+  const gm = loc.pathname.match(/^\/g\/(pj|j|t)/);
+  const grado = gm ? GRADOS[gm[1]] : null;
 
   useEffect(() => {
     const f = () => setFull(!!document.fullscreenElement);
@@ -37,6 +40,11 @@ export default function Hud() {
           </span>
         </Link>
       </div>
+      {grado && (
+        <Link to={`/g/${grado.id}`} className="hud-grado" style={{ '--gc': grado.color }} onClick={() => sfx.tap()} title="Menú del grado">
+          <span>{grado.icono}</span>{grado.nombre}
+        </Link>
+      )}
       <div className="hud-right">
         <Link to="/premios" className="coin-counter" id="coin-target" onClick={() => sfx.tap()} title="Cofre de premios">
           <span className="coin-icon">★</span>

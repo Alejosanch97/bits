@@ -5,6 +5,13 @@ import { LETRAS, silabasDe } from '../data/espanol.js';
 import Visual from '../components/Visual.jsx';
 import { baseLetter } from '../lib/slug.js';
 import { pick, shuffle } from './util.js';
+import { variado } from '../lib/variedad.js';
+
+// Letras del nivel según el grado (level.cons las trae el grado)
+const letrasDe = (level) => {
+  const cons = level.cons || CONSONANTES;
+  return level.set === 'v' ? VOCALES : level.set === 'c' ? cons : [...VOCALES, ...cons];
+};
 
 const VOCALES = 'aeiou'.split('');
 const CONSONANTES = 'mpsltndcrfbvgj'.split('');
@@ -17,7 +24,7 @@ const FONT = (px) => `700 ${px}px Andika, "Century Gothic", sans-serif`;
 
 export function Camino({ level, onAnswer }) {
   const [letra] = useState(() => {
-    const l = pick(level.set);
+    const l = variado(`cam${level.id}`, () => pick(letrasDe(level).filter((x) => x !== 'ñ' || !level.upper)), (x) => x, 4);
     return level.upper ? l.toUpperCase() : l;
   });
   const guide = useRef(null);
@@ -165,9 +172,9 @@ export function Camino({ level, onAnswer }) {
 Camino.meta = {
   rounds: 5,
   levels: [
-    { id: 'cv', label: 'Vocales', set: VOCALES },
-    { id: 'cc', label: 'Consonantes', set: CONSONANTES },
-    { id: 'cu', label: 'MAYÚSCULAS', set: [...VOCALES, ...CONSONANTES], upper: true },
+    { id: 'cv', label: 'Vocales', set: 'v' },
+    { id: 'cc', label: 'Consonantes', set: 'c' },
+    { id: 'cu', label: 'MAYÚSCULAS', set: 't', upper: true },
   ],
 };
 
@@ -175,13 +182,15 @@ Camino.meta = {
 // 22. El zoológico de los sonidos (sonido inicial)
 // ---------------------------------------------------------------------------
 const ANIMALES = ['🦁', '🐘', '🐼', '🦒', '🐵', '🐻', '🐯', '🦛'];
-const conImg = (l) => (LETRAS.find((x) => x.letra === l)?.palabras || []).filter((p) => p.emoji && !p.texto.includes(' ') && baseLetter(p.texto[0]) === l);
+const conImgDe = (vocab) => (l) => (vocab || LETRAS.flatMap((x) => x.palabras)).filter((p) => p.emoji && !p.texto.includes(' ') && baseLetter(p.texto[0]) === l);
 
 export function Zoologico({ level, onAnswer, onStep }) {
   const [st] = useState(() => {
-    const l = pick(level.set.filter((x) => conImg(x).length >= 3));
+    const conImg = conImgDe(level.vocab);
+    const set = letrasDe(level);
+    const l = variado(`zoo${level.id}`, () => pick(set.filter((x) => conImg(x).length >= 3)), (x) => x, 4);
     const buenas = shuffle(conImg(l)).slice(0, pick([1, 2, 2]));
-    const malas = shuffle(LETRAS.filter((x) => x.letra !== l).flatMap((x) => conImg(x.letra))).filter((p) => !buenas.some((b) => b.emoji === p.emoji)).slice(0, 4 - buenas.length);
+    const malas = shuffle(set.filter((x) => x !== l).flatMap((x) => conImg(x))).filter((p) => !buenas.some((b) => b.emoji === p.emoji)).slice(0, 4 - buenas.length);
     return { l, cards: shuffle([...buenas, ...malas]), n: buenas.length, animal: pick(ANIMALES) };
   });
   const [hechas, setHechas] = useState([]);
@@ -226,9 +235,9 @@ export function Zoologico({ level, onAnswer, onStep }) {
 }
 Zoologico.meta = {
   levels: [
-    { id: 'zv', label: 'Vocales', set: VOCALES },
-    { id: 'zc', label: 'Consonantes', set: CONSONANTES },
-    { id: 'zt', label: 'Todas las letras', set: [...VOCALES, ...CONSONANTES] },
+    { id: 'zv', label: 'Vocales', set: 'v' },
+    { id: 'zc', label: 'Consonantes', set: 'c' },
+    { id: 'zt', label: 'Todas las letras', set: 't' },
   ],
 };
 
@@ -238,13 +247,14 @@ Zoologico.meta = {
 export function Burbujas({ level, onAnswer }) {
   const [st] = useState(() => {
     let items;
+    const cons = (level.cons || CONSONANTES).filter((x) => silabasDe(x).length >= 5);
     if (level.silabas) {
-      const c = pick(CONSONANTES.filter((x) => silabasDe(x).length >= 5));
-      items = shuffle([...silabasDe(c), ...silabasDe(pick(CONSONANTES.filter((x) => x !== c)))]).slice(0, 7);
+      const c = pick(cons);
+      items = shuffle([...silabasDe(c), ...silabasDe(pick(cons.filter((x) => x !== c)))]).slice(0, 7);
     } else {
-      items = shuffle(level.set).slice(0, 7);
+      items = shuffle(letrasDe(level)).slice(0, 7);
     }
-    const target = pick(items);
+    const target = variado(`bub${level.id}`, () => pick(items), (x) => x, 3);
     const pos = items.map((_, i) => ({ left: 6 + ((i * 13.5) % 86), dur: 4 + (i % 3), delay: (i * 0.37) % 2 }));
     return { items, target, pos };
   });
@@ -280,9 +290,9 @@ export function Burbujas({ level, onAnswer }) {
 }
 Burbujas.meta = {
   levels: [
-    { id: 'bv', label: 'Vocales', set: VOCALES },
-    { id: 'bc', label: 'Consonantes', set: CONSONANTES },
-    { id: 'bu', label: 'MAYÚSCULAS', set: [...VOCALES, ...CONSONANTES], upper: true },
+    { id: 'bv', label: 'Vocales', set: 'v' },
+    { id: 'bc', label: 'Consonantes', set: 'c' },
+    { id: 'bu', label: 'MAYÚSCULAS', set: 't', upper: true },
     { id: 'bs', label: 'Sílabas (ma, me, mi…)', silabas: true },
   ],
 };

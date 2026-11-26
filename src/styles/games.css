@@ -409,3 +409,28 @@
   .word-wall, .word-wall.n12, .word-wall.n16, .word-wall.n10 { grid-template-columns: repeat(2, 1fr); }
   .camino-board { width: 320px; height: 320px; }
 }
+
+/* ---------- Juegos nuevos ---------- */
+.g-formas, .g-hora, .g-bonds, .g-lee { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.formas-q { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.formas-obj { font-family: var(--emoji); font-size: 150px; line-height: 1; animation: letterBob 2s infinite; }
+.formas-ops { display: grid; grid-template-columns: repeat(4, minmax(130px, 210px)); gap: 18px; justify-content: center; }
+.forma-opt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 130px; padding: 14px; border-radius: 30px; border: 4px solid var(--ink); background: #fff; box-shadow: var(--shadow); animation: optIn .5s both; transition: transform .2s; }
+.forma-opt:hover:not(:disabled) { transform: translateY(-6px) rotate(-2deg); }
+.forma-opt b { font-family: var(--display); font-weight: 400; font-size: 30px; color: var(--blue); }
+.forma-opt small { font-family: var(--read); font-weight: 700; font-size: 20px; color: var(--red); }
+.forma-opt.right { background: #9BE3B4; }
+.hora-main { display: flex; flex-direction: column; align-items: center; }
+.g-opt.reloj-opt { font-family: ui-monospace, monospace; font-weight: 900; background: linear-gradient(180deg, #2C3A85, #1D2A6B); color: #8FF0FF; }
+.g-opt.right, .g-opt.lee-opt.right { background: #9BE3B4; color: var(--ink); }
+.g-tienda { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: center; }
+.tienda-prod { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 22px; border-radius: 32px; border: 4px solid var(--ink); background: repeating-linear-gradient(90deg, #FFE4EC 0 24px, #fff 24px 48px); box-shadow: var(--shadow); }
+.tienda-emoji { font-family: var(--emoji); font-size: 110px; line-height: 1; animation: letterBob 2s infinite; }
+.tienda-prod b { font-family: var(--display); font-weight: 400; font-size: 32px; }
+.precio { font-family: var(--display); font-size: 40px; background: var(--sun); border: 3px solid var(--ink); border-radius: 16px; padding: 2px 16px; transform: rotate(-4deg); }
+.lee-texto { position: relative; max-width: 900px; padding: 22px 30px; border-radius: 30px; border: 4px solid var(--ink); background: #FFFBEF; box-shadow: var(--shadow); text-align: left; }
+.lee-texto p { margin: 0; font-family: var(--read); font-weight: 700; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.45; color: #1B1B24; }
+.lee-texto .g-ear { position: absolute; top: -18px; right: -14px; }
+.lee-q { width: 100%; animation: pageIn .4s both; }
+.g-opt.lee-opt { font-family: var(--read); font-weight: 700; font-size: clamp(22px, 2.4vw, 32px); min-height: 80px; }
+@media (max-width: 900px) { .g-tienda { grid-template-columns: 1fr; } .formas-ops { grid-template-columns: repeat(2, 1fr); } }
